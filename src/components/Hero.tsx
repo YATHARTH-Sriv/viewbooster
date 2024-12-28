@@ -1,5 +1,6 @@
-import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
+import { MdLogin } from "react-icons/md";
 
 export default function Hero() {
   return (
@@ -22,19 +23,30 @@ export default function Hero() {
               Careers
             </a>
           </nav>
-          <Button className="rounded-full mt-2 md:mt-0">Chat with us</Button>
+          <Link href="/Login">
+            <span className="rounded-full m-3 bg-white text-black px-4 py-2 hover:bg-gray-200 transition-colors duration-300">
+              Login
+            </span>
+          </Link>
         </header>
-
         <main className="flex-grow flex items-center justify-center px-4 -mt-10 md:-mt-20">
-          <div className="text-center text-white">
-            <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight mb-4">
-              Horizontal <br /> Scaling on TikTok
-            </h1>
-            <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-xl md:max-w-2xl mx-auto">
-              Millions of high-trust, low-cost views for mid-market and enterprise brands.
-            </p>
-          </div>
-        </main>
+        <div className="text-center text-white">
+          <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold leading-tight mb-4">
+            Horizontal <br /> Scaling on Youtube
+          </h1>
+          <p className="text-lg md:text-xl lg:text-2xl text-gray-300 max-w-xl md:max-w-2xl mx-auto mb-6">
+            Millions of high-trust, low-cost views for mid-market and enterprise brands.
+          </p>
+          <Link
+            href="/Login"
+            className="inline-flex items-center justify-center bg-black text-white hover:bg-white hover:text-black rounded-md px-6 py-3 font-medium transition-colors duration-300"
+            aria-label="Get Started and Login"
+          >
+            Get Started
+            <MdLogin className="ml-2 w-5 h-5" />
+          </Link>
+        </div>
+      </main>
       </div>
 
       <div className="w-full flex justify-center -mt-10 md:-mt-20 px-4">

@@ -5,10 +5,10 @@ import { FaInstagram } from "react-icons/fa6";
 import { FaTwitter } from "react-icons/fa";
 
 const socialLinks = [
-  { name: "GitHub", icon: FaGithub, url: "https://github.com", class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12  hover:bg-black" },
-  { name: "LinkedIn", icon: FaLinkedin, url: "https://linkedin.com" , class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-blue hover:bg-black" },
-  { name: "Instagram", icon: FaInstagram, url: "https://instagram.com" , class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-purple hover:bg-black" },
-  { name: "Twitter", icon: FaTwitter, url: "https://twitter.com", class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-blue hover:bg-black" },
+  { name: "GitHub", icon: FaGithub, url: "https://github.com/YATHARTH-Sriv/viewbooster", class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12  hover:bg-black" },
+  { name: "LinkedIn", icon: FaLinkedin, url: "https://www.linkedin.com/in/yatharth-srivastava-0b0382261/" , class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-blue hover:bg-black" },
+  { name: "Instagram", icon: FaInstagram, url: "https://www.instagram.com/yatharth_sriv/" , class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-purple hover:bg-black" },
+  { name: "Twitter", icon: FaTwitter, url: "https://twitter.com/yatharth_sriv", class:" rounded-md p-2 m-2 w-8 h-8 md:w-10 md:h-10 lg:w-12 lg:h-12 text-blue hover:bg-black" },
 ];
 
 export default function Footer() {
