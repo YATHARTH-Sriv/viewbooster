@@ -26,7 +26,7 @@ export const authOptions: NextAuthOptions = {
         .select("*")
         .eq("google_id", id)
         .single();
-
+      console.log(data, error);
       if (error && error.code === "PGRST116") {
         // User does not exist, insert into the database
         const { error: insertError } = await supabase
