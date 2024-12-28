@@ -1,9 +1,15 @@
-"use client";
+"use client"
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Video } from "@/types/datatypes";
-import { Card } from "@/components/ui/card";
-import { MdNavigateBefore, MdNavigateNext } from "react-icons/md";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 import { Chart } from "@/components/graph";
 import VideoPopup from "@/components/videopopup";
 import { signOut, useSession } from "next-auth/react";
@@ -23,24 +29,11 @@ function Page() {
 
   const [playlisturl, setPlaylisturl] = useState("");
   const [playlistvideos, setPlaylistvideos] = useState<Video[]>([]);
-  const [visibleIndex, setVisibleIndex] = useState(0);
   const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   const handleFetch = async () => {
     const response = await axios.post("/api/playlist", { playlisturl });
     setPlaylistvideos(response.data.videos);
-  };
-
-  const handleNext = () => {
-    if (visibleIndex + 4 < playlistvideos.length) {
-      setVisibleIndex(visibleIndex + 4);
-    }
-  };
-
-  const handlePrevious = () => {
-    if (visibleIndex - 4 >= 0) {
-      setVisibleIndex(visibleIndex - 4);
-    }
   };
 
   const handleVideoClick = (videoId: string) => {
@@ -60,13 +53,17 @@ function Page() {
       {/* Welcome Message */}
       <div className="flex items-center mb-6">
         {session && session.user.image && (
-          <Image
-            src={session.user.image}
-            alt={session?.user?.name}
-            className="w-12 h-12 rounded-full mr-4"
-          />
+          <div className="w-12 h-12 relative rounded-full overflow-hidden">
+            <Image
+              src={session.user.image}
+              alt={session?.user?.name || "User"}
+              className="object-cover"
+              fill
+              sizes="48px"
+            />
+          </div>
         )}
-        <h1 className="text-2xl font-semibold">
+        <h1 className="text-2xl font-semibold ml-4">
           Welcome, {session?.user?.name}
         </h1>
         <Button
@@ -77,7 +74,9 @@ function Page() {
           Sign Out
         </Button>
       </div>
+
       <h1 className="text-3xl font-bold mb-4 text-center">YouTube Dashboard</h1>
+      
       <div className="mb-6 flex justify-center">
         <input
           type="text"
@@ -95,63 +94,59 @@ function Page() {
       </div>
 
       {playlistvideos.length > 0 && (
-        <Card className="bg-gray-900 p-4">
-          <div className="relative">
-            <div className="flex overflow-hidden">
-              <div
-                className="flex transition-transform duration-300"
-                style={{
-                  transform: `translateX(-${visibleIndex * 25}%)`,
-                  width: `${(playlistvideos.length / 4) * 100}%`,
-                }}
-              >
-                {playlistvideos.map((video) => (
-                  <div
-                    key={video.videoId}
-                    className="flex-shrink-0 w-1/4 p-2"
-                    style={{ minWidth: "25%" }}
-                  >
-                    <div
-                      className="p-4 border border-gray-700 rounded-lg bg-white hover:bg-gray-700 cursor-pointer transition"
+        <div className="mx-auto max-w-7xl">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {playlistvideos.map((video, index) => (
+                <CarouselItem 
+                  key={video.videoId} 
+                  className="pl-2 md:pl-4 basis-full md:basis-1/2 lg:basis-1/3"
+                >
+                  <div className="p-1">
+                    <Card 
+                      className="border-gray-700 bg-gray-800 hover:bg-gray-700 cursor-pointer transition"
                       onClick={() => handleVideoClick(video.videoId)}
                     >
-                      <Image
-                        src={video.thumbnail}
-                        alt={video.title}
-                        className="mb-4 rounded-lg"
-                      />
-                      <h2 className="text-lg font-semibold">{video.title}</h2>
-                      <p className="text-sm text-gray-400">{video.publishedAt}</p>
-                    </div>
+                      <CardContent className="p-4">
+                        <div className="relative w-full pt-[56.25%] mb-4 rounded-lg overflow-hidden">
+                          <Image
+                            src={video.thumbnail}
+                            alt={video.title}
+                            className="absolute inset-0 w-full h-full object-cover hover:scale-105 transition-transform duration-200"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <h2 className="text-lg font-semibold line-clamp-2 text-white">
+                            {video.title}
+                          </h2>
+                          <p className="text-sm text-gray-400">
+                            {new Date(video.publishedAt).toLocaleDateString()}
+                          </p>
+                          <div className="flex gap-4 text-sm text-gray-400">
+                            <span>{Number(video.views).toLocaleString()} views</span>
+                            {video.likeCount && (
+                              <span>{Number(video.likeCount).toLocaleString()} likes</span>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex justify-center mt-4">
-              <button
-                onClick={handlePrevious}
-                className={`mx-2 p-3 rounded-full bg-gray-800 text-white hover:bg-gray-700 ${
-                  visibleIndex <= 0 ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-                disabled={visibleIndex <= 0}
-              >
-                <MdNavigateBefore className="h-6 w-6" />
-              </button>
-              <button
-                onClick={handleNext}
-                className={`mx-2 p-3 rounded-full bg-gray-800 text-white hover:bg-gray-700 ${
-                  visibleIndex + 4 >= playlistvideos.length
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
-                disabled={visibleIndex + 4 >= playlistvideos.length}
-              >
-                <MdNavigateNext className="h-6 w-6" />
-              </button>
-            </div>
-          </div>
-        </Card>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
+          </Carousel>
+        </div>
       )}
 
       {playlistvideos.length > 0 && (

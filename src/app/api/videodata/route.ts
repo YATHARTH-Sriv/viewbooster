@@ -29,7 +29,7 @@ export async function POST(request: Request) {
       commentCount: videoData.items[0].statistics.commentCount,
       publishedAt: videoData.items[0].snippet.publishedAt,
       title: videoData.items[0].snippet.title,
-      thumbnail: videoData.items[0].snippet.thumbnails.medium.url,
+      thumbnail: videoData.items[0].snippet.thumbnails.standard.url,
     }
     return NextResponse.json({ requestedvideodata });
   } catch (error) {

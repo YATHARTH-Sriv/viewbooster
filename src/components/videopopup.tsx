@@ -1,6 +1,10 @@
-"use client";
 import React, { useState, useEffect } from "react";
-import { Skeleton } from "@/components/ui/skeleton"; // ShadCN Skeleton Component
+import { Skeleton } from "@/components/ui/skeleton";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Eye, ThumbsUp, MessageCircle, Star } from "lucide-react";
 import axios from "axios";
 import Image from "next/image";
 
@@ -38,63 +42,115 @@ const VideoPopup: React.FC<VideoPopupProps> = ({ videoId, onClose }) => {
     fetchVideoData();
   }, [videoId]);
 
+  const formatNumber = (num?: string) => {
+    if (!num) return "0";
+    const n = parseInt(num);
+    if (n >= 1000000) {
+      return (n / 1000000).toFixed(1) + "M";
+    } else if (n >= 1000) {
+      return (n / 1000).toFixed(1) + "K";
+    }
+    return n.toString();
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return "";
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  };
+
   return (
-    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-75 z-50">
-      <div className="bg-gray-900 text-white p-6 rounded-lg shadow-xl w-3/4 md:w-1/2 relative">
-        {/* Close button */}
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-xl text-gray-400 hover:text-gray-200 focus:outline-none"
-        >
-          ✕
-        </button>
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="max-w-4xl w-11/12 max-h-[90vh] overflow-y-auto bg-gray-900 text-white border-gray-800">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold leading-tight">
+            {loading ? "Loading Video Details..." : videoData?.title}
+          </DialogTitle>
+          <div className="flex justify-between items-center">
+            <Badge variant="secondary" className="w-fit">
+              Video Details
+            </Badge>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-400 hover:text-white"
+              onClick={onClose}
+            >
+              {/* <X className="h-4 w-4" /> */}
+            </Button>
+          </div>
+        </DialogHeader>
 
         {loading ? (
-          <div>
-            <Skeleton className="h-52 w-full mb-4 rounded" />
-            <Skeleton className="h-6 w-3/4 mb-3" />
-            <Skeleton className="h-6 w-1/2 mb-3" />
-            <Skeleton className="h-6 w-1/3" />
+          <div className="space-y-4">
+            <Skeleton className="h-72 w-full rounded-lg" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-6 w-1/2" />
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-24 rounded-lg" />
+              ))}
+            </div>
           </div>
         ) : (
-          <div>
-            {/* Thumbnail */}
-            <Image
-              src={videoData?.thumbnail as string
-              }
-              alt={videoData?.title as string}
-              className="mb-6 w-full rounded-lg shadow"
-            />
+          <div className="space-y-6">
+            <div className="relative w-full aspect-video rounded-lg overflow-hidden">
+              <Image
+                src={videoData?.thumbnail as string}
+                alt={videoData?.title as string}
+                className="object-cover"
+                fill
+                sizes="(max-width: 300px) 40vw, (max-width: 500px) 30vw, 20vw"
+                priority
+              />
+            </div>
 
-            {/* Video Title */}
-            <h2 className="text-2xl font-bold mb-4">{videoData?.title}</h2>
+            <div className="space-y-2">
+              <p className="text-sm text-gray-400">
+                Published on {formatDate(videoData?.publishedAt)}
+              </p>
+            </div>
 
-            {/* Published Date */}
-            <p className="text-sm text-gray-400 mb-6">Published: {videoData?.publishedAt}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-4 flex flex-col items-center justify-center space-y-2">
+                  <Eye className="h-5 w-5 text-blue-400" />
+                  <p className="text-sm font-medium text-gray-300">Views</p>
+                  <p className="text-xl font-bold text-white">{formatNumber(videoData?.viewCount)}</p>
+                </CardContent>
+              </Card>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 gap-4 text-center">
-              <div className="bg-gray-800 p-4 rounded shadow">
-                <p className="text-lg font-semibold">Views</p>
-                <p className="text-2xl font-bold">{videoData?.viewCount}</p>
-              </div>
-              <div className="bg-gray-800 p-4 rounded shadow">
-                <p className="text-lg font-semibold">Likes</p>
-                <p className="text-2xl font-bold">{videoData?.likeCount}</p>
-              </div>
-              <div className="bg-gray-800 p-4 rounded shadow">
-                <p className="text-lg font-semibold">Favorites</p>
-                <p className="text-2xl font-bold">{videoData?.favoriteCount}</p>
-              </div>
-              <div className="bg-gray-800 p-4 rounded shadow">
-                <p className="text-lg font-semibold">Comments</p>
-                <p className="text-2xl font-bold">{videoData?.commentCount}</p>
-              </div>
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-4 flex flex-col items-center justify-center space-y-2">
+                  <ThumbsUp className="h-5 w-5 text-green-400" />
+                  <p className="text-sm font-medium text-gray-300">Likes</p>
+                  <p className="text-xl font-bold text-white">{formatNumber(videoData?.likeCount)}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-4 flex flex-col items-center justify-center space-y-2">
+                  <MessageCircle className="h-5 w-5 text-purple-400" />
+                  <p className="text-sm font-medium text-gray-300">Comments</p>
+                  <p className="text-xl font-bold text-white">{formatNumber(videoData?.commentCount)}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gray-800 border-gray-700">
+                <CardContent className="p-4 flex flex-col items-center justify-center space-y-2">
+                  <Star className="h-5 w-5 text-yellow-400" />
+                  <p className="text-sm font-medium text-gray-300">Favorites</p>
+                  <p className="text-xl font-bold text-white">{formatNumber(videoData?.favoriteCount)}</p>
+                </CardContent>
+              </Card>
             </div>
           </div>
         )}
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

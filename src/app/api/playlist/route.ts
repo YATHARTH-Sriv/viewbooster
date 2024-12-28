@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         title: item.snippet.title,
         publishedAt: item.snippet.publishedAt,
         videoId: videoId,
-        thumbnail: item.snippet.thumbnails.medium.url,
+        thumbnail: item.snippet.thumbnails.standard.url,
         views: videoData.requestedvideodata?.viewCount,
         likeCount: videoData.requestedvideodata?.likeCount,
         favoriteCount: videoData.requestedvideodata?.favoriteCount,
