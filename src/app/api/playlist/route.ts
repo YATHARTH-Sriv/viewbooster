@@ -31,7 +31,7 @@ export async function POST(request: Request) {
       const videoId = item.contentDetails.videoId;
       
       // Call the videodata API to get additional details like viewCount, likeCount, etc.
-      const videoDataResponse = await fetch(`${process.env.BASE_URL}/api/videodata`, {
+      const videoDataResponse = await fetch(`https://viewbooster.vercel.app/api/videodata`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
