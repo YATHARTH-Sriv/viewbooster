@@ -9,7 +9,7 @@ export default function Hero() {
         <header className="py-2 px-4 md:px-6 flex items-center justify-between flex-wrap">
           <div className="flex items-center">
             <span className="text-2xl md:text-3xl text-white ml-2 md:ml-4 font-thin pl-2">
-              Parallel
+              YoutubeStats
             </span>
           </div>
           <nav className="hidden md:flex space-x-4 lg:space-x-8 mt-2 md:mt-0">
