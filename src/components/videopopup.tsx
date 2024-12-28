@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton"; // ShadCN Skeleton Component
 import axios from "axios";
+import Image from "next/image";
 
 interface VideoPopupProps {
   videoId: string;
@@ -58,9 +59,10 @@ const VideoPopup: React.FC<VideoPopupProps> = ({ videoId, onClose }) => {
         ) : (
           <div>
             {/* Thumbnail */}
-            <img
-              src={videoData?.thumbnail}
-              alt={videoData?.title}
+            <Image
+              src={videoData?.thumbnail as string
+              }
+              alt={videoData?.title as string}
               className="mb-6 w-full rounded-lg shadow"
             />
 

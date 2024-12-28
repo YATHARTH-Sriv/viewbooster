@@ -9,6 +9,7 @@ import VideoPopup from "@/components/videopopup";
 import { signOut, useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 function Page() {
   const { data: session } = useSession();
@@ -59,7 +60,7 @@ function Page() {
       {/* Welcome Message */}
       <div className="flex items-center mb-6">
         {session && session.user.image && (
-          <img
+          <Image
             src={session.user.image}
             alt={session?.user?.name}
             className="w-12 h-12 rounded-full mr-4"
@@ -114,7 +115,7 @@ function Page() {
                       className="p-4 border border-gray-700 rounded-lg bg-white hover:bg-gray-700 cursor-pointer transition"
                       onClick={() => handleVideoClick(video.videoId)}
                     >
-                      <img
+                      <Image
                         src={video.thumbnail}
                         alt={video.title}
                         className="mb-4 rounded-lg"
