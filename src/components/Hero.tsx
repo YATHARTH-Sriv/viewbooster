@@ -23,11 +23,6 @@ export default function Hero() {
               Careers
             </a>
           </nav>
-          <Link href="/Login">
-            <span className="rounded-full m-3 bg-white text-black px-4 py-2 hover:bg-gray-200 transition-colors duration-300">
-              Login
-            </span>
-          </Link>
         </header>
         <main className="flex-grow flex items-center justify-center px-4 -mt-10 md:-mt-20">
         <div className="text-center text-white">
