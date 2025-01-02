@@ -42,7 +42,7 @@ const VideoPopup: React.FC<VideoPopupProps> = ({ videoId, onClose }) => {
     fetchVideoData();
   }, [videoId]);
 
-  const formatNumber = (num?: string) => {
+  const formatNumber = (num?: string) => { //  large numbers (e.g., views, likes) into a more readable format
     if (!num) return "0";
     const n = parseInt(num);
     if (n >= 1000000) {
@@ -53,7 +53,7 @@ const VideoPopup: React.FC<VideoPopupProps> = ({ videoId, onClose }) => {
     return n.toString();
   };
 
-  const formatDate = (dateString?: string) => {
+  const formatDate = (dateString?: string) => {  //Formats the video publish date into a readable string.
     if (!dateString) return "";
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
