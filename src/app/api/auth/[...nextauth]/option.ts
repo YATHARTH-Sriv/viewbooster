@@ -1,6 +1,8 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
+import CredentialsProvider from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from 'uuid';
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -14,42 +16,72 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
     }),
+    CredentialsProvider({
+      id: "guest",
+      name: "Guest",
+      credentials: {},
+      async authorize() {
+        // Create an ephemeral guest user without database storage
+        return {
+          id: `guest_${uuidv4()}`,
+          name: "Guest User",
+          email: null,
+          image: null,
+          isGuest: true,
+        };
+      },
+    }),
   ],
   callbacks: {
-    async signIn({ user }) {
-      // Extract user information
-      const { id, email, name, image } = user;
+    async signIn({ user, account }) {
+      // Only handle database operations for Google sign-in
+      if (account?.provider === "google") {
+        const { id, email, name, image } = user;
 
-      // Check if the user exists in the database
-      const { data, error } = await supabase
-        .from("users")
-        .select("*")
-        .eq("google_id", id)
-        .single();
-      console.log(data, error);
-      if (error) {
-        // User does not exist, insert into the database
-        const { error: insertError } = await supabase
+        // Check if the user exists in the database
+        const { data, error } = await supabase
           .from("users")
-          .insert({
-            google_id: id,
-            email,
-            name,
-            image,
-          });
+          .select("*")
+          .eq("google_id", id)
+          .single();
 
-        if (insertError) {
-          console.error("Error saving user to database:", insertError);
-          return false; // Fail the sign-in process
+        if (error) {
+          // User does not exist, insert into the database
+          const { error: insertError } = await supabase
+            .from("users")
+            .insert({
+              google_id: id,
+              email,
+              name,
+              image,
+            });
+
+          if (insertError) {
+            console.error("Error saving user to database:", insertError);
+            return false;
+          }
         }
-      } else if (error) {
-        // Log unexpected errors
-        console.error("Error fetching user from database:", error);
-        return false; // Fail the sign-in process
       }
 
-      // User exists or was successfully created
+      // Always allow sign in
       return true;
+    },
+    async session({ session, token }) {
+      // Add isGuest flag to session
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          isGuest: token.isGuest as boolean,
+        },
+      };
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        // Add isGuest flag to JWT token
+        token.isGuest = (user as any).isGuest || false;
+      }
+      return token;
     },
   },
 };

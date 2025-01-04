@@ -14,7 +14,7 @@ interface Video {
   favorite_count: string;
   comment_count: string;
   playlist_id: string;
-  // tags: string[];
+  // tags: string[]; // Uncomment if you need to store tags
 }
 
 interface VideoDataResponse {
@@ -38,20 +38,22 @@ const supabase = createClient(
 
 export async function POST(request: Request) {
   try {
-    const { playlisturl } = await request.json();
+    const { playlisturl, isGuest } = await request.json();
     console.log("Playlist URL:", playlisturl);
     const session = await getServerSession(authOptions);
-
     // Add session check
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      if(!isGuest){
+        console.log("Unauthorized request");
+        return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      }
     }
-
+    console.log("Check 1");
 
     if (!playlisturl) {
       return NextResponse.json({ error: "Playlist URL is required" }, { status: 400 });
     }
-
+    console.log("Check 2");
     const playlistId = playlisturl.split("list=")[1];
     if (!playlistId) {
       return NextResponse.json({ error: "Invalid playlist URL" }, { status: 400 });
@@ -98,8 +100,13 @@ export async function POST(request: Request) {
       }
 
       // Update search history and return existing videos
-      await updateSearchHistory(session.user.email, playlistTitle, playlistId);
-      await updateSearchHistory(session.user.email, playlistTitle, playlistId);
+      if(isGuest){
+        return NextResponse.json({ videos });
+      }
+      if (session && session.user && session.user.email) {
+        await updateSearchHistory(session.user.email, playlistTitle, playlistId);
+      }
+      // await updateSearchHistory(session.user.email, playlistTitle, playlistId);
       return NextResponse.json({ videos });
     }
 
@@ -130,7 +137,12 @@ export async function POST(request: Request) {
     }
 
     // Update search history
+    if(isGuest){
+      return NextResponse.json({ videos });
+    }
+    if (session && session.user && session.user.email) {
     await updateSearchHistory(session.user.email, playlistTitle, playlistId);
+    }
 
     return NextResponse.json({ videos });
   } catch (error) {

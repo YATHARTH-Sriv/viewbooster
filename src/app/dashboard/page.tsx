@@ -37,16 +37,15 @@ interface Video {
   comment_count?: string;
 }
 
-
-interface UserData{
-  id: number,
-  google_id: string,
-  email: string,
-  name: string,
-  image: string,
-  created_at: string,
-  updated_at: string,
-  search_history?: search []
+interface UserData {
+  id: number;
+  google_id: string;
+  email: string;
+  name: string;
+  image: string;
+  created_at: string;
+  updated_at: string;
+  search_history?: search[];
 }
 
 interface ChartData {
@@ -57,7 +56,7 @@ interface ChartData {
   comments: number;
 }
 
-// Components
+// Loading Component
 const LoadingState = () => (
   <div className="space-y-4">
     <Skeleton className="h-[200px] w-full bg-gray-800" />
@@ -70,6 +69,7 @@ const LoadingState = () => (
   </div>
 );
 
+// Error Component
 const ErrorAlert = ({ message }: { message: string }) => (
   <Alert variant="destructive" className="mb-4">
     <AlertCircle className="h-4 w-4" />
@@ -82,7 +82,7 @@ function Dashboard() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [userData, setUserData] = useState<UserData>();
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [activeComponent, setActiveComponent] = useState<string>("home");
   const [playlisturl, setPlaylisturl] = useState("");
   const [playlistVideos, setPlaylistVideos] = useState<Video[]>([]);
@@ -92,21 +92,37 @@ function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
 
-  // Effects
+  // Check authentication
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login");
     }
   }, [status, router]);
 
+  // Fetch user data
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await axios.get("/api/userdata");
-        setUserData(response.data);
+        if (session?.user?.isGuest) {
+          // Set default data for guest users
+          setUserData({
+            id: 0,
+            google_id: "",
+            email: "",
+            name: "Guest User",
+            image: "",
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+            search_history: []
+          });
+        } else if (session) {
+          // Fetch data for authenticated users
+          const response = await axios.get("/api/userdata");
+          setUserData(response.data);
+        }
       } catch (error) {
-        setError("Failed to fetch user data");
         console.error("Error fetching user data:", error);
+        setError("Failed to fetch user data");
       }
     };
 
@@ -115,18 +131,25 @@ function Dashboard() {
     }
   }, [session]);
 
-  // Handlers
+  // Handle playlist fetch
   const handleFetchPlaylist = async () => {
+    if (!playlisturl.trim()) {
+      setError("Please enter a valid playlist URL");
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const response = await axios.post("/api/playlist", { playlisturl });
-      console.log("Playlist data:", response.data);
+      const response = await axios.post("/api/playlist", {
+        playlisturl,
+        isGuest: session?.user?.isGuest
+      });
       setPlaylistVideos(response.data.videos);
     } catch (error) {
-      setError("Failed to fetch playlist data. Please check the URL and try again.");
       console.error("Error fetching playlist:", error);
+      setError("Failed to fetch playlist data. Please check the URL and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -136,7 +159,7 @@ function Dashboard() {
     setSelectedVideoId(videoId);
   };
 
-  // Data transformations
+  // Transform data for chart
   const chartData: ChartData[] = playlistVideos.map((video) => ({
     name: video.title,
     views: Number(video.view_count),
@@ -147,13 +170,13 @@ function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-950 text-white font-sans">
-      {/* Sidebar Component */}
+      {/* Sidebar */}
       <Sidebar
         isOpen={isSidebarOpen}
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         setActiveComponent={setActiveComponent}
         activeComponent={activeComponent}
-        // userData={userData}
+        // isGuest={session?.user?.isGuest}
       />
 
       {/* Main Content */}
@@ -164,7 +187,18 @@ function Dashboard() {
       >
         {activeComponent === "home" && (
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold mb-6">YouTube Dashboard</h1>
+            {/* Header */}
+            <div className="flex justify-between items-center mb-6">
+              <h1 className="text-3xl font-bold">YouTube Dashboard</h1>
+              {session?.user?.isGuest && (
+                <Alert className="max-w-md">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    You're in guest mode. Some features may be limited.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
 
             {error && <ErrorAlert message={error} />}
 
@@ -222,7 +256,7 @@ function Dashboard() {
                                 />
                               </div>
                               <div className="space-y-2">
-                                <h2 className="text-lg font-semibold line-clamp-2">
+                                <h2 className="text-lg font-semibold line-clamp-2 text-black">
                                   {video.title}
                                 </h2>
                                 <p className="text-sm text-black">
@@ -268,11 +302,20 @@ function Dashboard() {
         )}
 
         {/* Analytics Component */}
-        {activeComponent === "analytics" && <VideoAnalytics playlistdata={playlistVideos} />
-      }
+        {activeComponent === "analytics" && (
+          <VideoAnalytics 
+            playlistdata={playlistVideos}
+            // isGuest={session?.user?.isGuest}
+          />
+        )}
 
         {/* Settings Component */}
-        {activeComponent === "settings" && userData && <Settings userdata={userData}/>}
+        {activeComponent === "settings" && userData && (
+          <Settings 
+            userdata={userData}
+            // isGuest={session?.user?.isGuest}
+          />
+        )}
       </main>
     </div>
   );
