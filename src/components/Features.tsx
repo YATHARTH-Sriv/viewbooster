@@ -30,7 +30,7 @@ export default function Feature() {
 
       {/* Feature Cards */}
       <div className="flex items-center justify-center p-6 -mt-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-5xl">
           {cardData.map((card, index) => (
             <Card
               key={index}
@@ -104,7 +104,7 @@ const cardData = [
   {
     title: "Content that viewers love",
     content:
-      "Create engaging, high-quality content that resonates with your target audience and keeps them coming back for more. By identifying what works best for you and your audience, you can craft the perfect content.",
+      "Create engaging, high-quality content that resonates with your target audience and keeps them coming back for more. By identifying what works best for you amd your audience what they exactly love and love to watch",
     gradient: "bg-gradient-to-br from-pink-500 via-red-500 to-yellow-500",
     icon: <BsGraphUpArrow className="text-3xl md:text-4xl text-white" />,
   },
@@ -118,7 +118,7 @@ const cardData = [
   {
     title: "Proven experience",
     content:
-      "We know what we are doing with the help of AI to create and use the correct tags and keywords to get more views and subscribers.",
+      "We know what we are doing with help of AI create use correct tags and keywords to get more views and subscribers",
     gradient: "bg-gradient-to-br from-orange-500 via-yellow-500 to-red-500",
     icon: <FaRegHandshake className="text-3xl md:text-4xl text-white" />,
   },
@@ -128,12 +128,12 @@ const faqs = [
   {
     question: "What services do you offer?",
     answer:
-      "We offer a wide range of services designed to maximize your YouTube channel's potential.",
+      "We offer a wide range of offers",
   },
   {
     question: "How can it help?",
     answer:
-      " It helps you gain more views and subscribers by optimizing your content and tags.",
+      " It can help you to get more views and subscribers",
   },
   {
     question: "Do you provide ongoing support?",
