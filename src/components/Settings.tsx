@@ -12,7 +12,7 @@ interface UserData {
   google_id: string;
   email: string;
   name: string;
-  image: string;
+  image?: string;
   created_at: string;
   updated_at: string;
   search_history?: search[];
