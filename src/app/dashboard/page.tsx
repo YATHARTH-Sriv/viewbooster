@@ -305,6 +305,7 @@ function Dashboard() {
         {activeComponent === "analytics" && (
           <VideoAnalytics 
             playlistdata={playlistVideos}
+            playlisturl={playlisturl}
             // isGuest={session?.user?.isGuest}
           />
         )}
